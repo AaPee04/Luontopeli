@@ -8,6 +8,18 @@
         android:name="android.hardware.sensor.stepcounter"
         android:required="false" />  <!-- false = sovellus toimii ilmankin -->
 
+    <!-- Internet-lupa osmdroid-karttatiilien lataukseen -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- GPS-tarkkuussijainti -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- Verkkosijainti (varapaikannus) -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- Askelmittari (Android 10+) -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+
+    <!-- Kamera (lisätään viikolla 4) -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
