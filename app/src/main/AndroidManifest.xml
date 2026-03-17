@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <!-- Tarvitaan Android 10+ (API 29+) askelmittarille -->
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <!-- Vanhemmille laitteille (API < 29) ei tarvita lupaa -->
+    <uses-feature
+        android:name="android.hardware.sensor.stepcounter"
+        android:required="false" />  <!-- false = sovellus toimii ilmankin -->
 
     <application
         android:allowBackup="true"
