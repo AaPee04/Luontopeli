@@ -98,6 +98,10 @@ class StepCounterManager(context: Context) {
 
     // Tarkista tukeeko laite askelmittaria
     fun isStepSensorAvailable(): Boolean = stepSensor != null
+
+    companion object {
+        const val STEP_LENGTH_METERS = 0.74f
+    }
 }
 
 // Askelpituuden arviointi (keskiarvot):

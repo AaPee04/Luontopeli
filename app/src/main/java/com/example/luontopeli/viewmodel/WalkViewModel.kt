@@ -58,7 +58,7 @@ class WalkViewModel(application: Application) : AndroidViewModel(application) {
         // Tallenna päättynyt sessio Room-tietokantaan
         viewModelScope.launch {
             _currentSession.value?.let { session ->
-                db.walkSessionDao().insert(session)
+//                db.walkSessionDao().insert(session)
             }
         }
     }
