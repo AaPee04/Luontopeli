@@ -4,30 +4,57 @@ package com.example.luontopeli.data.repository
 
 import com.example.luontopeli.data.local.dao.NatureSpotDao
 import com.example.luontopeli.data.local.entity.NatureSpot
+import com.example.luontopeli.data.remote.firebase.AuthManager
+import com.example.luontopeli.data.remote.firebase.FirestoreManager
+import com.example.luontopeli.data.remote.firebase.StorageManager
 import kotlinx.coroutines.flow.Flow
 
-class NatureSpotRepository(private val dao: NatureSpotDao) {
+// 📁 data/repository/NatureSpotRepository.kt
 
+class NatureSpotRepository(
+    private val dao: NatureSpotDao,
+    private val firestoreManager: FirestoreManager,
+    private val storageManager: StorageManager,
+    private val authManager: AuthManager
+) {
     val allSpots: Flow<List<NatureSpot>> = dao.getAllSpots()
-    val spotsWithLocation: Flow<List<NatureSpot>> = dao.getSpotsWithLocation()
 
+    // Tallenna löytö: ensin Room, sitten Firebase
     suspend fun insertSpot(spot: NatureSpot) {
-        dao.insert(spot)
+        val spotWithUser = spot.copy(userId = authManager.currentUserId)
+
+        // 1. Tallenna paikallisesti HETI (toimii offline-tilassakin)
+        dao.insert(spotWithUser.copy(synced = false))
+
+        // 2. Yritä synkronoida Firebaseen
+        syncSpotToFirebase(spotWithUser)
     }
 
-    // Päivitä ML-tunnistustulos (lisätään viikolla 5)
-    suspend fun updatePlantLabel(id: String, label: String, confidence: Float) {
-        dao.insert(  // REPLACE strategia päivittää olemassa olevan
-            NatureSpot(id = id, name = label, latitude = 0.0, longitude = 0.0,
-                plantLabel = label, confidence = confidence)
-        )
+    // Synkronoi yksittäinen kohde Firebaseen
+    private suspend fun syncSpotToFirebase(spot: NatureSpot) {
+        try {
+            // 2a. Lataa kuva Storageen (jos paikallinen kuva olemassa)
+            val firebaseImageUrl = spot.imageLocalPath?.let { localPath ->
+                storageManager.uploadImage(localPath, spot.id).getOrNull()
+            }
+
+            // 2b. Tallenna metadata Firestoreen
+            val spotWithUrl = spot.copy(imageFirebaseUrl = firebaseImageUrl)
+            firestoreManager.saveSpot(spotWithUrl).getOrThrow()
+
+            // 2c. Merkitse Room:ssa synkronoiduksi
+            dao.markSynced(spot.id, firebaseImageUrl ?: "")
+        } catch (e: Exception) {
+            // Synkronointi epäonnistui – yritetään uudelleen myöhemmin
+            // synced = false pysyy Room:ssa
+        }
     }
 
-    suspend fun deleteSpot(spot: NatureSpot) {
-        dao.delete(spot)
-    }
-
-    suspend fun getUnsyncedSpots(): List<NatureSpot> {
-        return dao.getUnsyncedSpots()
+    // Synkronoi kaikki odottavat kohteet (kutsutaan yhteyden palautuessa)
+    suspend fun syncPendingSpots() {
+        val unsyncedSpots = dao.getUnsyncedSpots()
+        unsyncedSpots.forEach { spot ->
+            syncSpotToFirebase(spot)
+        }
     }
 }

@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -28,7 +29,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
 
-    // Compose BOM — hallitsee Compose-kirjastojen versiot automaattisesti
+    // Compose BOM
     val composeBom = platform(libs.androidx.compose.bom)
     implementation(composeBom)
     implementation(libs.androidx.compose.ui)
@@ -45,32 +46,38 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
-    // Hilt (riippuvuusinjektio)
+    // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
-    // OpenStreetMap — kartat ilman API-avainta (lisätään viikolla 3)
+    // OpenStreetMap
     implementation(libs.osmdroid.android)
 
-    // CameraX (lisätään viikolla 4)
+    // CameraX
     implementation(libs.camera.core)
     implementation(libs.camera.camera2)
     implementation(libs.camera.lifecycle)
     implementation(libs.camera.view)
     implementation(libs.camera.extensions)
 
-    // Coil — kuvan lataus (lisätään viikolla 4)
+    // Coil
     implementation(libs.coil.compose)
 
-    // ML Kit — kasvintunnistus (lisätään viikolla 5)
+    // ML Kit
     implementation(libs.mlkit.image.labeling)
 
-    // Splash Screen (lisätään viikolla 7)
+    // Splash Screen
     implementation(libs.androidx.core.splashscreen)
 
-    // Accompanist Permissions — ajonaikaiset luvat (lisätään viikolla 2–3)
+    // Accompanist Permissions
     implementation(libs.accompanist.permissions)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
+
+    // Firebase BOM
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
 }
