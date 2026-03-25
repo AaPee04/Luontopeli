@@ -16,6 +16,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.luontopeli.viewmodel.MapViewModel
 import com.example.luontopeli.viewmodel.WalkViewModel
+import com.example.luontopeli.viewmodel.formatDistance
 import com.example.luontopeli.viewmodel.formatDuration
 import com.example.luontopeli.viewmodel.toFormattedDate
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
