@@ -61,6 +61,15 @@ dependencies {
     implementation(libs.camera.view)
     implementation(libs.camera.extensions)
 
+    implementation("androidx.camera:camera-core:1.3.3")
+    implementation("androidx.camera:camera-camera2:1.3.3")
+// Lifecycle binding (tämä tuo ProcessCameraProviderin)
+    implementation("androidx.camera:camera-lifecycle:1.3.3")
+// CameraX View (PreviewView)
+    implementation("androidx.camera:camera-view:1.3.3")
+// Guava (tarvitaan addListener + ListenableFuture)
+    implementation("com.google.guava:guava:31.1-android")
+
     // Coil
     implementation(libs.coil.compose)
 

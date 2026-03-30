@@ -1,25 +1,17 @@
 package com.example.luontopeli.camera
-
 // 📁 camera/CameraScreen.kt
 
 import android.Manifest
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.*
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.CameraAlt
@@ -48,23 +40,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.luontopeli.viewmodel.CameraViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import java.io.File
 
 @Composable
-fun CameraScreen(viewModel: CameraViewModel = viewModel()) {
+fun CameraScreen(
+    viewModel: CameraViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    // ImageCapture use case – tallennetaan muuttujaan jotta nappia painaessa voidaan käyttää
-    val imageCapture = remember { ImageCapture.Builder()
-        .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-        .build()
+    val imageCapture = remember {
+        ImageCapture.Builder()
+            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+            .build()
     }
 
-    // Lupatarkistus
     var hasCameraPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
@@ -84,12 +77,14 @@ fun CameraScreen(viewModel: CameraViewModel = viewModel()) {
     val isLoading by viewModel.isLoading.collectAsState()
 
     if (!hasCameraPermission) {
-        // Lupanäkymä
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
-                    Icons.Default.CameraAlt, contentDescription = null,
-                    modifier = Modifier.size(64.dp), tint = Color.Gray)
+                    Icons.Default.CameraAlt,
+                    contentDescription = null,
+                    modifier = Modifier.size(64.dp),
+                    tint = Color.Gray
+                )
                 Text("Kameran lupa tarvitaan", modifier = Modifier.padding(8.dp))
                 Button(onClick = { permissionLauncher.launch(Manifest.permission.CAMERA) }) {
                     Text("Myönnä lupa")
@@ -100,9 +95,7 @@ fun CameraScreen(viewModel: CameraViewModel = viewModel()) {
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Kameran esikatselu (tai otettu kuva)
         if (capturedImagePath == null) {
-            // CameraX Preview – AndroidView koska PreviewView ei ole Composable
             AndroidView(
                 factory = { ctx ->
                     val previewView = PreviewView(ctx)
@@ -111,22 +104,20 @@ fun CameraScreen(viewModel: CameraViewModel = viewModel()) {
                     cameraProviderFuture.addListener({
                         val cameraProvider = cameraProviderFuture.get()
 
-                        // Preview use case – näyttää kamerakuvan
                         val preview = Preview.Builder().build().also {
                             it.setSurfaceProvider(previewView.surfaceProvider)
                         }
 
-                        // Sido kamera lifecycle-omistajaan ja use caseihin
                         try {
                             cameraProvider.unbindAll()
                             cameraProvider.bindToLifecycle(
                                 lifecycleOwner,
                                 CameraSelector.DEFAULT_BACK_CAMERA,
                                 preview,
-                                imageCapture  // Molemmat use caset samaan aikaan
+                                imageCapture
                             )
-                        } catch (e: Exception) {
-                            // Kameran sidonta epäonnistui
+                        } catch (_: Exception) {
+                            // voit logittaa jos haluat
                         }
                     }, ContextCompat.getMainExecutor(ctx))
 
@@ -135,9 +126,10 @@ fun CameraScreen(viewModel: CameraViewModel = viewModel()) {
                 modifier = Modifier.fillMaxSize()
             )
 
-            // Kuvanappi
             Box(
-                modifier = Modifier.fillMaxSize().padding(32.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(32.dp),
                 contentAlignment = Alignment.BottomCenter
             ) {
                 FloatingActionButton(
@@ -145,14 +137,16 @@ fun CameraScreen(viewModel: CameraViewModel = viewModel()) {
                     containerColor = MaterialTheme.colorScheme.primary
                 ) {
                     if (isLoading) {
-                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
                     } else {
                         Icon(Icons.Default.Camera, "Ota kuva", tint = Color.White)
                     }
                 }
             }
         } else {
-            // Näytetään otettu kuva + toimintopainikkeet
             CapturedImageView(
                 imagePath = capturedImagePath!!,
                 onRetake = { viewModel.clearCapturedImage() },
@@ -169,7 +163,6 @@ fun CapturedImageView(
     onSave: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        // Otettu kuva
         AsyncImage(
             model = File(imagePath),
             contentDescription = "Otettu kuva",
@@ -180,7 +173,6 @@ fun CapturedImageView(
                 .background(Color.Black)
         )
 
-        // Toimintopainikkeet
         Row(
             modifier = Modifier
                 .fillMaxWidth()
