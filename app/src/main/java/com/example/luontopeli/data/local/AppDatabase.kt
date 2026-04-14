@@ -5,6 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.luontopeli.data.local.dao.NatureSpotDao
+import com.example.luontopeli.data.local.dao.WalkSessionDao
+import com.example.luontopeli.data.local.entity.NatureSpot
+import com.example.luontopeli.data.local.entity.WalkSession
 
 // 📁 data/local/AppDatabase.kt
 

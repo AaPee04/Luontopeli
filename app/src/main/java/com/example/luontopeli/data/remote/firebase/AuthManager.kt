@@ -1,42 +1,46 @@
+// 📁 data/remote/firebase/AuthManager.kt
 package com.example.luontopeli.data.remote.firebase
 
-// 📁 data/remote/firebase/AuthManager.kt
-
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Firebase Authentication -hallinta.
+ *
+ * Käyttää anonyymiä kirjautumista (signInAnonymously), joka antaa
+ * käyttäjälle uniikin UID:n ilman rekisteröitymistä. UID säilyy
+ * sovelluksen uudelleenkäynnistysten välillä.
+ */
 class AuthManager {
+
+    /** Firebase Auth -instanssi (singleton) */
     private val auth = FirebaseAuth.getInstance()
 
-    // Nykyinen kirjautunut käyttäjä (null jos ei kirjautunut)
-    val currentUser: FirebaseUser?
-        get() = auth.currentUser
+    /** Nykyisen käyttäjän UID tai "anonymous" jos ei kirjautunut */
+    val currentUserId: String
+        get() = auth.currentUser?.uid ?: "anonymous"
 
-    val currentUserId: String?
-        get() = auth.currentUser?.uid
-
+    /** Onko käyttäjä kirjautunut sisään */
     val isSignedIn: Boolean
         get() = auth.currentUser != null
 
-    // Kirjaudu sisään anonyymisti (tai palauta olemassa oleva sessio)
+    /**
+     * Kirjautuu sisään anonyymisti.
+     * Firebase luo uniikin UID:n, joka säilyy kunnes käyttäjä
+     * kirjautuu ulos tai sovelluksen data tyhjennetään.
+     *
+     * @return Result.success(uid) tai Result.failure(exception)
+     */
     suspend fun signInAnonymously(): Result<String> {
         return try {
-            // Jos jo kirjautunut, palauta nykyinen UID
-            val existingUser = auth.currentUser
-            if (existingUser != null) {
-                return Result.success(existingUser.uid)
-            }
-
-            // Luo uusi anonyymi käyttäjä
             val result = auth.signInAnonymously().await()
-            val uid = result.user?.uid ?: return Result.failure(Exception("UID puuttuu"))
-            Result.success(uid)
+            Result.success(result.user?.uid ?: "unknown")
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
+    /** Kirjautuu ulos ja poistaa anonyymin session. */
     fun signOut() {
         auth.signOut()
     }
