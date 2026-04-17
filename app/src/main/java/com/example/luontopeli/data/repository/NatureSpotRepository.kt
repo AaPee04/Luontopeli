@@ -8,10 +8,11 @@ import com.example.luontopeli.data.remote.firebase.AuthManager
 import com.example.luontopeli.data.remote.firebase.FirestoreManager
 import com.example.luontopeli.data.remote.firebase.StorageManager
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
 // 📁 data/repository/NatureSpotRepository.kt
 
-class NatureSpotRepository(
+class NatureSpotRepository @Inject constructor(
     private val dao: NatureSpotDao,
     private val firestoreManager: FirestoreManager,
     private val storageManager: StorageManager,

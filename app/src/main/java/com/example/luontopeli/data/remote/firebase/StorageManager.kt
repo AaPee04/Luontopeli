@@ -6,8 +6,9 @@ import android.net.Uri
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import java.io.File
+import javax.inject.Inject
 
-class StorageManager {
+class StorageManager @Inject constructor() {
     private val storage = FirebaseStorage.getInstance()
 
     // Lataa kuva Storageen ja palauta julkinen URL

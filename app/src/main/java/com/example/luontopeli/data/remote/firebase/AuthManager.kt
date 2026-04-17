@@ -3,6 +3,7 @@ package com.example.luontopeli.data.remote.firebase
 
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
 /**
  * Firebase Authentication -hallinta.
@@ -11,7 +12,7 @@ import kotlinx.coroutines.tasks.await
  * käyttäjälle uniikin UID:n ilman rekisteröitymistä. UID säilyy
  * sovelluksen uudelleenkäynnistysten välillä.
  */
-class AuthManager {
+class AuthManager @Inject constructor() {
 
     /** Firebase Auth -instanssi (singleton) */
     private val auth = FirebaseAuth.getInstance()

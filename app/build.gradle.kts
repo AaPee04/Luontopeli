@@ -56,8 +56,8 @@ android {
             )
         }
         debug {
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
+            //applicationIdSuffix = ".debug"
+            //versionNameSuffix = "-debug"
         }
     }
 
@@ -135,6 +135,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)       // Authentication – käyttäjätunnistus
     implementation(libs.firebase.firestore)  // Firestore – löytöjen metadata pilveen
+    implementation(libs.firebase.storage)
 
     // Guava – ratkaisee Firebase + CameraX ListenableFuture -ristiriidan
     implementation("com.google.guava:guava:32.1.3-android")

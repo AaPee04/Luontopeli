@@ -7,6 +7,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
 /**
  * Firestore-hallinta luontolöytöjen pilvisynkronointiin.
@@ -14,7 +15,7 @@ import kotlinx.coroutines.tasks.await
  * Tallentaa NatureSpot-oliot "nature_spots"-kokoelmaan.
  * Jokainen löytö on oma dokumenttinsa, jonka ID on NatureSpot.id.
  */
-class FirestoreManager {
+class FirestoreManager @Inject constructor() {
 
     /** Firestore-instanssi */
     private val db = FirebaseFirestore.getInstance()
